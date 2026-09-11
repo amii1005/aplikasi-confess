@@ -1,0 +1,316 @@
+<!DOCTYPE html>
+<html lang="id">
+
+<head>
+
+    <meta charset="UTF-8">
+
+    <meta name="viewport"
+          content="width=device-width, initial-scale=1.0">
+
+    <title>Buat Confess 💌</title>
+
+    <link rel="stylesheet" href="style.css">
+
+</head>
+
+
+<body>
+
+    <div class="background">
+
+        <div class="card">
+
+            <div class="heart">💖</div>
+
+            <h1>Buat Confess</h1>
+
+            <p>
+                Isi pesan yang ingin kamu sampaikan
+                kepada seseorang yang spesial.
+            </p>
+
+
+            <!-- NAMA PENGIRIM -->
+
+            <input
+                type="text"
+                id="pengirim"
+                placeholder="Nama kamu"
+            >
+
+
+            <!-- NAMA PENERIMA -->
+
+            <input
+                type="text"
+                id="penerima"
+                placeholder="Nama orang yang dituju"
+            >
+
+
+            <!-- PESAN -->
+
+            <textarea
+                id="pesan"
+                placeholder="Tulis pesan confess kamu..."
+            ></textarea>
+
+
+            <!-- FOTO -->
+
+            <div class="pilihan">
+
+                <label>
+                    🖼️ Tambahkan Foto
+                </label>
+
+                <input
+                    type="file"
+                    id="foto"
+                    accept="image/*"
+                >
+
+            </div>
+            <!-- LAGU -->
+
+<div class="pilihan">
+
+    <label>
+        🎵 Tambahkan Lagu
+    </label>
+
+    <input
+        type="file"
+        id="lagu"
+        accept="audio/*"
+    >
+
+</div>
+
+
+            <!-- PREVIEW FOTO -->
+
+            <img
+                id="previewFoto"
+                class="preview-foto"
+                alt="Preview foto"
+            >
+
+
+            <!-- TEMA -->
+
+            <div class="pilihan">
+
+                <label>
+                    🎨 Pilih Tema
+                </label>
+
+
+                <select id="tema">
+
+                    <option value="pink">
+                        🌸 Sweet Pink
+                    </option>
+
+                    <option value="red">
+                        🌹 Romantic Red
+                    </option>
+
+                    <option value="purple">
+                        💜 Purple Dream
+                    </option>
+
+                    <option value="dark">
+                        🌙 Midnight Love
+                    </option>
+
+                </select>
+
+            </div>
+
+
+            <!-- TOMBOL -->
+
+            <button onclick="lihatConfess()">
+
+                Lihat Confess 💕
+
+            </button>
+
+        </div>
+
+    </div>
+
+
+
+    <script>
+
+        // =========================
+        // PREVIEW FOTO
+        // =========================
+
+        document
+            .getElementById("foto")
+            .addEventListener("change", function () {
+
+                const file = this.files[0];
+
+                if (!file) {
+                    return;
+                }
+
+
+                const reader = new FileReader();
+
+
+                reader.onload = function (event) {
+
+                    const preview =
+                        document.getElementById("previewFoto");
+
+                    preview.src =
+                        event.target.result;
+
+                    preview.style.display =
+                        "block";
+
+
+                    // Simpan foto
+
+                    localStorage.setItem(
+                        "foto",
+                        event.target.result
+                    );
+
+                };
+
+
+                reader.readAsDataURL(file);
+
+            });
+
+            // =========================
+// LAGU
+// =========================
+
+document
+    .getElementById("lagu")
+    .addEventListener("change", function () {
+
+        const file = this.files[0];
+
+        if (!file) {
+            return;
+        }
+
+        const reader = new FileReader();
+
+        reader.onload = function (event) {
+
+            localStorage.setItem(
+                "lagu",
+                event.target.result
+            );
+
+            localStorage.setItem(
+                "namaLagu",
+                file.name
+            );
+
+        };
+
+        reader.readAsDataURL(file);
+
+    });
+
+
+        // =========================
+        // LIHAT CONFESS
+        // =========================
+
+        function lihatConfess() {
+
+            const pengirim =
+                document
+                    .getElementById("pengirim")
+                    .value
+                    .trim();
+
+
+            const penerima =
+                document
+                    .getElementById("penerima")
+                    .value
+                    .trim();
+
+
+            const pesan =
+                document
+                    .getElementById("pesan")
+                    .value
+                    .trim();
+
+
+            const tema =
+                document
+                    .getElementById("tema")
+                    .value;
+
+
+            // Validasi
+
+            if (
+                pengirim === "" ||
+                penerima === "" ||
+                pesan === ""
+            ) {
+
+                alert(
+                    "Silakan isi semua data terlebih dahulu ❤️"
+                );
+
+                return;
+
+            }
+
+
+            // Simpan data
+
+            localStorage.setItem(
+                "pengirim",
+                pengirim
+            );
+
+
+            localStorage.setItem(
+                "penerima",
+                penerima
+            );
+
+
+            localStorage.setItem(
+                "pesan",
+                pesan
+            );
+
+
+            localStorage.setItem(
+                "tema",
+                tema
+            );
+
+
+            // Pindah ke halaman confess
+
+            window.location.href =
+                "confess.html";
+
+        }
+
+    </script>
+
+
+</body>
+
+</html>

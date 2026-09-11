@@ -1,0 +1,465 @@
+<!DOCTYPE html>
+<html lang="id">
+
+<head>
+
+    <meta charset="UTF-8">
+
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>Untukmu 💌</title>
+
+    <link rel="stylesheet" href="style.css">
+
+</head>
+
+
+<body>
+
+    <div class="background">
+
+        <div class="confess-card">
+
+            <div class="envelope">
+                💌
+            </div>
+            <img
+    id="fotoConfess"
+    class="foto-confess"
+    alt="Foto confess"
+>
+
+            <p class="small-text">
+                Ada pesan khusus untukmu...
+            </p>
+            <div class="music-player">
+
+    <div class="music-icon">
+        🎵
+    </div>
+
+    <div class="music-info">
+
+        <strong id="namaLagu">
+            Lagu untukmu
+        </strong>
+
+        <span>
+            Dengarkan sambil membaca 💕
+        </span>
+
+    </div>
+
+    <button
+        id="tombolMusik"
+        onclick="putarMusik()"
+    >
+        ▶️
+    </button>
+
+</div>
+
+<audio id="audioLagu"></audio>
+
+            <h1 id="judul">
+                Untukmu ❤️
+            </h1>
+
+            <div class="surat">
+
+                <p id="pesan">
+                    Memuat pesan...
+                </p>
+
+            </div>
+
+            <p class="dari">
+
+                Dengan perasaan yang tulus,
+
+                <br>
+
+                <strong id="pengirim">
+                    ...
+                </strong>
+
+            </p>
+
+
+            <p class="pertanyaan">
+
+                Apakah kamu merasakan hal yang sama? ❤️
+
+            </p>
+
+
+            <div class="buttons">
+
+                <button
+                    class="yes-button"
+                    onclick="jawabYa()">
+
+                    ❤️ Aku juga
+
+                </button>
+
+
+                <button
+                    class="no-button"
+                    onclick="jawabTidak()">
+
+                    😢 Maaf
+
+                </button>
+
+            </div>
+
+        </div>
+
+    </div>
+    <button class="share-button" onclick="bagikanConfess()">
+    🔗 Bagikan Confess
+</button>
+
+
+
+
+    <!-- HASIL JAWABAN -->
+
+    <div
+        id="hasil"
+        class="hasil-overlay">
+
+        <div class="hasil-card">
+
+            <div
+                id="hasilIcon"
+                class="hasil-icon">
+
+                💌
+
+            </div>
+
+
+            <h2 id="hasilJudul">
+                ...
+            </h2>
+
+
+            <p id="hasilPesan">
+                ...
+            </p>
+
+
+            <div class="hasil-buttons">
+
+                <button onclick="tutupHasil()">
+
+                    💌 Tutup
+
+                </button>
+
+
+                <button onclick="confessBaru()">
+
+                    💕 Buat Confess Baru
+
+                </button>
+
+            </div>
+
+        </div>
+
+    </div>
+
+
+
+    <script>
+
+        // =========================
+        // MENGAMBIL DATA
+        // =========================
+
+        const pengirim =
+            localStorage.getItem("pengirim");
+
+        const penerima =
+            localStorage.getItem("penerima");
+
+        const pesan =
+            localStorage.getItem("pesan");
+        const foto =
+    localStorage.getItem("foto");
+
+const tema =
+    localStorage.getItem("tema");
+    const lagu =
+    localStorage.getItem("lagu");
+
+const namaLagu =
+    localStorage.getItem("namaLagu");
+
+    
+ // =========================
+// MENAMPILKAN FOTO
+// =========================
+
+if (foto) {
+
+    const fotoElement =
+        document.getElementById("fotoConfess");
+
+    fotoElement.src = foto;
+
+    fotoElement.style.display = "block";
+
+}
+
+// =========================
+// MENAMPILKAN LAGU
+// =========================
+
+if (lagu) {
+
+    const audio =
+        document.getElementById("audioLagu");
+
+    audio.src = lagu;
+
+
+    if (namaLagu) {
+
+        document
+            .getElementById("namaLagu")
+            .innerText = namaLagu;
+
+    }
+
+}
+
+// =========================
+// PLAY / PAUSE LAGU
+// =========================
+
+function putarMusik() {
+
+    const audio =
+        document.getElementById("audioLagu");
+
+    const tombol =
+        document.getElementById("tombolMusik");
+
+
+    if (audio.paused) {
+
+        audio.play();
+
+        tombol.innerText = "⏸️";
+
+    } else {
+
+        audio.pause();
+
+        tombol.innerText = "▶️";
+
+    }
+
+}
+
+// =========================
+// TEMA
+// =========================
+
+if (tema) {
+
+    document.body.classList.add(
+        "tema-" + tema
+    );
+
+}
+
+
+        // =========================
+        // MENAMPILKAN DATA
+        // =========================
+
+        if (pengirim && penerima && pesan) {
+
+            document.getElementById("judul").innerText =
+                "Untuk " + penerima + " ❤️";
+
+            document.getElementById("pesan").innerText =
+                pesan;
+
+            document.getElementById("pengirim").innerText =
+                pengirim;
+
+        } else {
+
+            document.getElementById("judul").innerText =
+                "Belum ada confess 💌";
+
+            document.getElementById("pesan").innerText =
+                "Silakan buat confess terlebih dahulu.";
+
+            document.getElementById("pengirim").innerText =
+                "-";
+
+        }
+
+
+
+        // =========================
+        // JAWABAN "AKU JUGA"
+        // =========================
+
+        function jawabYa() {
+
+            document.getElementById("hasil").className =
+                "hasil-overlay berhasil";
+
+
+            document.getElementById("hasilIcon").innerText =
+                "💖";
+
+
+            document.getElementById("hasilJudul").innerText =
+                "Yay! ❤️";
+
+
+            document.getElementById("hasilPesan").innerText =
+                "Ternyata perasaan kalian sama!";
+
+
+            buatHati();
+
+        }
+
+
+
+        // =========================
+        // JAWABAN "MAAF"
+        // =========================
+
+        function jawabTidak() {
+
+            document.getElementById("hasil").className =
+                "hasil-overlay lembut";
+
+
+            document.getElementById("hasilIcon").innerText =
+                "🤍";
+
+
+            document.getElementById("hasilJudul").innerText =
+                "Tidak apa-apa 🤍";
+
+
+            document.getElementById("hasilPesan").innerText =
+                "Terima kasih sudah membaca dan menghargai perasaanku.";
+
+        }
+
+
+
+        // =========================
+        // TUTUP HASIL
+        // =========================
+
+        function tutupHasil() {
+
+            document.getElementById("hasil").className =
+                "hasil-overlay";
+
+        }
+
+
+
+        // =========================
+        // BUAT CONFESS BARU
+        // =========================
+
+        function confessBaru() {
+
+            localStorage.removeItem("pengirim");
+
+            localStorage.removeItem("penerima");
+
+            localStorage.removeItem("pesan");
+
+
+            window.location.href =
+                "create.html";
+
+        }
+
+
+
+        // =========================
+        // ANIMASI HATI
+        // =========================
+
+        function buatHati() {
+
+            for (let i = 0; i < 25; i++) {
+
+                const hati =
+                    document.createElement("div");
+
+
+                hati.className =
+                    "hati-terbang";
+
+
+                hati.innerText =
+                    "❤️";
+
+
+                hati.style.left =
+                    Math.random() * 100 + "%";
+
+
+                hati.style.animationDelay =
+                    Math.random() * 2 + "s";
+
+
+                hati.style.fontSize =
+                    (15 + Math.random() * 25) + "px";
+
+
+                document.body.appendChild(hati);
+
+
+                setTimeout(function () {
+
+                    hati.remove();
+
+                }, 4000);
+
+            }
+
+        }
+ // =========================
+// BAGIKAN CONFESS
+// =========================
+
+function bagikanConfess() {
+
+    const link = window.location.href;
+
+    document.getElementById("hasilIcon").innerText = "🔗";
+
+    document.getElementById("hasilJudul").innerText =
+        "Bagikan Confess 💌";
+
+    document.getElementById("hasilPesan").innerHTML =
+        "Salin link di bawah ini:<br><br>" +
+        "<input id='linkConfess' value='" + link + "' readonly>";
+
+    document.getElementById("hasil").className =
+        "hasil-overlay berhasil";
+}
+</script>
+
+</body>
+</html>
