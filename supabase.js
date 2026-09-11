@@ -4,8 +4,11 @@ const SUPABASE_URL =
 const SUPABASE_KEY =
     "sb_publishable_kLdCZ4D1xPR5jpTpENFxSA_Y9iuGtjz";
 
-const supabase =
+const supabaseClient =
     window.supabase.createClient(
         SUPABASE_URL,
         SUPABASE_KEY
     );
+
+// Dipakai oleh confess.html
+const supabase = supabaseClient;
