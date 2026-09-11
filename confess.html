@@ -1,63 +1,38 @@
 <!DOCTYPE html>
 <html lang="id">
-
 <head>
-
     <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-    <meta
-        name="viewport"
-        content="width=device-width, initial-scale=1.0"
-    >
+    <title>Untukmu 💕</title>
 
-    <title>Ada Sesuatu Untukmu 💌</title>
+    <link rel="stylesheet" href="style.css">
 
-    <link
-        rel="stylesheet"
-        href="style.css"
-    >
-
-    <script
-        src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2">
-    </script>
-
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <script src="supabase.js"></script>
-
 </head>
 
+<body class="pink">
 
-<body>
+<div class="container">
 
-<div class="background">
-
-    <div class="card" id="confessCard">
+    <div class="card">
 
         <!-- TAHAP 1 -->
-
         <div id="tahap1">
 
-            <div class="heart">
-                💌
-            </div>
-
-            <h1>
-                Hai... 👀
-            </h1>
+            <h1>Hai... 👀</h1>
 
             <p>
-                Ada seseorang yang ingin
-                menyampaikan sesuatu kepadamu.
+                Ada seseorang yang ingin menyampaikan sesuatu kepadamu.
             </p>
 
             <p>
-                Tapi sebelum itu...
-            </p>
-
-            <h2>
+                Tapi sebelum itu...<br>
                 Kamu penasaran? 💗
-            </h2>
+            </p>
 
-            <button onclick="tahapDua()">
+            <button onclick="bukaPesan()">
                 Buka pesannya 💌
             </button>
 
@@ -65,35 +40,19 @@
 
 
         <!-- TAHAP 2 -->
+        <div id="tahap2" style="display:none;">
 
-        <div
-            id="tahap2"
-            style="display:none;"
-        >
-
-            <div class="heart">
-                💖
-            </div>
-
-            <h1>
-                Tunggu dulu... 🌸
-            </h1>
+            <h1>Tunggu dulu... 🌸</h1>
 
             <p>
-                Seseorang menitipkan pesan
-                khusus untukmu.
+                Seseorang menitipkan pesan khusus untukmu.
             </p>
 
             <p>
-                Mungkin ada sesuatu yang
-                sudah lama ingin dia katakan...
+                Mungkin ada sesuatu yang sudah lama ingin dia katakan... 👀
             </p>
 
-            <h2>
-                Siap membacanya? 👀
-            </h2>
-
-            <button onclick="tahapTiga()">
+            <button onclick="siapMembaca()">
                 Aku siap 💕
             </button>
 
@@ -101,88 +60,83 @@
 
 
         <!-- TAHAP 3 -->
+        <div id="tahap3" style="display:none;">
 
-        <div
-            id="tahap3"
-            style="display:none;"
-        >
+            <h1>Untukmu 💕</h1>
 
-            <div class="heart">
-                💗
+            <h2 id="namaPenerima"></h2>
+
+            <div class="pesan-confess" id="isiPesan"></div>
+
+
+            <!-- FOTO -->
+            <div id="bagianFoto" style="display:none; margin-top:20px;">
+
+                <img
+                    id="fotoConfess"
+                    src=""
+                    alt="Foto untukmu"
+                    style="
+                        max-width:100%;
+                        border-radius:15px;
+                        display:block;
+                        margin:auto;
+                    "
+                >
+
             </div>
 
-            <h1 id="judulConfess">
-                Untukmu 💕
-            </h1>
+
+            <!-- LAGU -->
+            <div id="bagianLagu" style="display:none; margin-top:20px;">
+
+                <p>
+                    🎵 <strong id="namaLagu"></strong>
+                </p>
+
+                <a
+                    id="linkLagu"
+                    href="#"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                >
+                    🎧 Dengarkan lagunya
+                </a>
+
+            </div>
 
 
-            <div id="fotoContainer"></div>
-
-
-            <p
-                id="pesanConfess"
-                style="
-                    white-space:pre-wrap;
-                    margin-top:20px;
-                "
-            ></p>
-
-
-            <div id="laguContainer"></div>
-
-
-            <p
-                id="pengirimConfess"
-                style="
-                    margin-top:25px;
-                    font-size:14px;
-                "
-            ></p>
+            <!-- PENGIRIM -->
+            <p style="margin-top:25px;">
+                Dari: <strong id="namaPengirim"></strong> 💌
+            </p>
 
 
             <hr>
 
 
             <h2>
-                Maukah kamu menerima
-                perasaanku? 💗
+                Maukah kamu menerima perasaanku? 💗
             </h2>
 
 
-            <div
-                id="tombolJawaban"
-                style="
-                    display:flex;
-                    gap:10px;
-                    justify-content:center;
-                    flex-wrap:wrap;
-                "
-            >
+            <div class="jawaban">
 
-                <button onclick="jawabYa()">
+                <button onclick="kirimJawaban('ya')">
                     Iya ❤️
                 </button>
 
-                <button onclick="jawabTidak()">
+                <button onclick="kirimJawaban('tidak')">
                     Tidak 💔
                 </button>
 
             </div>
 
 
-            <div
-                id="hasilJawaban"
-                style="
-                    display:none;
-                    margin-top:20px;
-                "
-            ></div>
+            <p id="hasilJawaban"></p>
 
 
-            <button
-                onclick="bagikanConfess()"
-                style="margin-top:20px;"
-            >
+            <button onclick="bagikanConfess()">
                 Bagikan Confess 💌
             </button>
 
@@ -193,90 +147,57 @@
 </div>
 
 
-
 <script>
-
-
-// =====================================
-// AMBIL ID
-// =====================================
-
-const params =
-    new URLSearchParams(
-        window.location.search
-    );
-
-
-const confessId =
-    params.get("id");
-
 
 let confessData = null;
 
 
+// ===============================
+// AMBIL ID DARI LINK
+// ===============================
 
-// =====================================
-// AMBIL DATA DARI SUPABASE
-// =====================================
+const params = new URLSearchParams(window.location.search);
+const confessId = params.get("id");
 
-async function ambilConfess() {
+
+// ===============================
+// LOAD DATA CONFESS
+// ===============================
+
+async function loadConfess() {
 
     if (!confessId) {
-
-        document
-            .getElementById("confessCard")
-            .innerHTML = `
-
-                <div class="heart">
-                    💔
+        document.body.innerHTML = `
+            <div class="container">
+                <div class="card">
+                    <h1>Confess tidak ditemukan 💔</h1>
+                    <p>Link confess tidak lengkap.</p>
                 </div>
-
-                <h1>
-                    Confess tidak ditemukan
-                </h1>
-
-                <p>
-                    Link confess tidak valid.
-                </p>
-
-            `;
-
+            </div>
+        `;
         return;
     }
 
 
-    const {
-        data,
-        error
-    } =
-        await supabaseClient
-            .from("confessions")
-            .select("*")
-            .eq("id", confessId)
-            .single();
+    const { data, error } = await supabase
+        .from("confessions")
+        .select("*")
+        .eq("id", confessId)
+        .single();
 
 
-    if (error || !data) {
+    if (error) {
 
         console.error(error);
 
-        document
-            .getElementById("confessCard")
-            .innerHTML = `
-
-                <div class="heart">
-                    💔
+        document.body.innerHTML = `
+            <div class="container">
+                <div class="card">
+                    <h1>Ups... 💔</h1>
+                    <p>Confess tidak dapat ditemukan.</p>
                 </div>
-
-                <h1>
-                    Confess tidak ditemukan
-                </h1>
-
-                <p>
-                    Mungkin link sudah tidak valid.
-                </p>
-
-            `;
+            </div>
+        `;
 
         return;
     }
@@ -284,333 +205,155 @@ async function ambilConfess() {
 
     confessData = data;
 
-}
+
+    // Tema
+    document.body.className = confessData.tema || "pink";
 
 
+    // ===============================
+    // ISI TAHAP 3
+    // ===============================
 
-// =====================================
-// TAHAP 1 → TAHAP 2
-// =====================================
-
-function tahapDua() {
-
-    document
-        .getElementById("tahap1")
-        .style.display = "none";
+    document.getElementById("namaPenerima").innerText =
+        confessData.penerima || "";
 
 
-    document
-        .getElementById("tahap2")
-        .style.display = "block";
-
-}
+    document.getElementById("isiPesan").innerText =
+        confessData.pesan || "";
 
 
-
-// =====================================
-// TAHAP 2 → TAHAP 3
-// =====================================
-
-function tahapTiga() {
-
-    if (!confessData) {
-
-        alert(
-            "Pesan belum siap. Coba tunggu sebentar ❤️"
-        );
-
-        return;
-    }
+    document.getElementById("namaPengirim").innerText =
+        confessData.pengirim || "";
 
 
-    document
-        .getElementById("tahap2")
-        .style.display = "none";
-
-
-    document
-        .getElementById("tahap3")
-        .style.display = "block";
-
-
-    tampilkanPesan();
-
-}
-
-
-
-// =====================================
-// TAMPILKAN PESAN
-// =====================================
-
-function tampilkanPesan() {
-
-    document.body.className =
-        confessData.tema || "pink";
-
-
-    document
-        .getElementById("judulConfess")
-        .innerHTML =
-            "Untuk " +
-            escapeHTML(
-                confessData.penerima
-            ) +
-            " 💕";
-
-
-    document
-        .getElementById("pesanConfess")
-        .innerHTML =
-            escapeHTML(
-                confessData.pesan
-            );
-
-
-    document
-        .getElementById("pengirimConfess")
-        .innerHTML =
-            "Dari: <strong>" +
-            escapeHTML(
-                confessData.pengirim
-            ) +
-            "</strong> 💌";
-
-
-
-    // =================================
+    // ===============================
     // FOTO
-    // =================================
+    // ===============================
 
     if (confessData.foto) {
 
-        document
-            .getElementById("fotoContainer")
-            .innerHTML = `
+        document.getElementById("fotoConfess").src =
+            confessData.foto;
 
-                <img
-                    src="${confessData.foto}"
-                    class="foto-confess"
-                    alt="Foto confess"
-                >
-
-            `;
-
+        document.getElementById("bagianFoto").style.display =
+            "block";
     }
 
 
-
-    // =================================
+    // ===============================
     // LAGU
-    // =================================
+    // ===============================
 
     if (confessData.lagu) {
 
-        document
-            .getElementById("laguContainer")
-            .innerHTML = `
+        document.getElementById("linkLagu").href =
+            confessData.lagu;
 
-                <div style="margin-top:20px;">
+        document.getElementById("namaLagu").innerText =
+            confessData.nama_lagu || "Dengarkan lagu ini 💕";
 
-                    <p>
-                        🎵
-                        ${escapeHTML(
-                            confessData.nama_lagu ||
-                            "Lagu"
-                        )}
-                    </p>
-
-                    <audio
-                        controls
-                        autoplay
-                        loop
-                        style="width:100%;"
-                    >
-
-                        <source
-                            src="${confessData.lagu}"
-                        >
-
-                    </audio>
-
-                </div>
-
-            `;
-
+        document.getElementById("bagianLagu").style.display =
+            "block";
     }
 
 }
 
 
+// ===============================
+// TAHAP 1 → TAHAP 2
+// ===============================
 
-// =====================================
-// JAWABAN
-// =====================================
+function bukaPesan() {
+
+    document.getElementById("tahap1").style.display =
+        "none";
+
+    document.getElementById("tahap2").style.display =
+        "block";
+
+}
+
+
+// ===============================
+// TAHAP 2 → TAHAP 3
+// ===============================
+
+function siapMembaca() {
+
+    document.getElementById("tahap2").style.display =
+        "none";
+
+    document.getElementById("tahap3").style.display =
+        "block";
+
+}
+
+
+// ===============================
+// KIRIM JAWABAN
+// ===============================
 
 async function kirimJawaban(jawaban) {
 
-    const {
-        data,
-        error
-    } =
-        await supabaseClient
-            .rpc(
-                "submit_confession_response",
-                {
-                    p_confess_id:
-                        confessId,
+    if (!confessData) return;
 
-                    p_jawaban:
-                        jawaban
-                }
-            );
+
+    const { data, error } = await supabase.rpc(
+        "submit_confession_response",
+        {
+            p_confess_id: confessData.id,
+            p_jawaban: jawaban
+        }
+    );
 
 
     if (error) {
 
         console.error(error);
 
-        alert(
-            "Gagal mengirim jawaban.\n\n" +
-            error.message
-        );
+        document.getElementById("hasilJawaban").innerText =
+            "Terjadi kesalahan. Silakan coba lagi.";
 
         return;
     }
 
 
-    if (!data) {
-
-        alert(
-            "Jawaban sudah pernah dikirim 💌"
-        );
-
-        return;
-    }
+    document.getElementById("hasilJawaban").innerText =
+        jawaban === "ya"
+            ? "💗 Terima kasih sudah menjawab..."
+            : "💌 Terima kasih sudah memberikan jawaban...";
 
 
-    document
-        .getElementById("tombolJawaban")
-        .style.display = "none";
-
-
-    const hasil =
-        document.getElementById(
-            "hasilJawaban"
-        );
-
-
-    hasil.style.display = "block";
-
-
-    if (jawaban === "ya") {
-
-        hasil.innerHTML = `
-
-            <h2>
-                💖 Yeay!
-            </h2>
-
-            <p>
-                Jawabanmu sudah dikirim.
-            </p>
-
-            <div style="font-size:40px;">
-                💕💗💖💞
-            </div>
-
-        `;
-
-    } else {
-
-        hasil.innerHTML = `
-
-            <h2>
-                💌 Jawaban sudah dikirim
-            </h2>
-
-            <p>
-                Terima kasih sudah menjawab
-                dengan jujur.
-            </p>
-
-            <div style="font-size:40px;">
-                💔🌸
-            </div>
-
-        `;
-
-    }
+    document.querySelectorAll(".jawaban button")
+        .forEach(button => {
+            button.disabled = true;
+        });
 
 }
 
 
-
-// =====================================
-// IYA
-// =====================================
-
-function jawabYa() {
-
-    kirimJawaban("ya");
-
-}
-
-
-
-// =====================================
-// TIDAK
-// =====================================
-
-function jawabTidak() {
-
-    kirimJawaban("tidak");
-
-}
-
-
-
-// =====================================
+// ===============================
 // BAGIKAN LINK
-// =====================================
+// ===============================
 
-async function bagikanConfess() {
+function bagikanConfess() {
 
-    const link =
-        window.location.href;
+    navigator.clipboard.writeText(
+        window.location.href
+    );
 
-
-    try {
-
-        await navigator.clipboard.writeText(
-            link
-        );
-
-        alert(
-            "Link confess berhasil disalin 💕"
-        );
-
-    } catch (error) {
-
-        prompt(
-            "Salin link ini:",
-            link
-        );
-
-    }
+    alert("💌 Link confess berhasil disalin!");
 
 }
 
 
+// ===============================
+// JALANKAN
+// ===============================
 
-// =====================================
-// AMBIL DATA SAAT HALAMAN DIBUKA
-// =====================================
-
-ambilConfess();
+loadConfess();
 
 </script>
 
 </body>
-
 </html>
