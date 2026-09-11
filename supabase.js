@@ -1,14 +1,12 @@
 const SUPABASE_URL =
-    "https://sycuueukzazluxoyhozn.supabase.co";
+"https://sycuueukzazluxoyhozn.supabase.co";
 
 const SUPABASE_KEY =
-    "sb_publishable_kLdCZ4D1xPR5jpTpENFxSA_Y9iuGtjz";
+"sb_publishable_kLdCZ4D1xPR5jpTpENFxSA_Y9iuGtjz";
 
-const supabaseClient =
-    window.supabase.createClient(
-        SUPABASE_URL,
-        SUPABASE_KEY
-    );
-
-// Supaya confess.html juga bisa memakai nama "supabase"
-const supabase = supabaseClient;
+// Buat koneksi Supabase secara global
+window.supabaseClient =
+window.supabase.createClient(
+SUPABASE_URL,
+SUPABASE_KEY
+);
