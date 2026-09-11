@@ -11,6 +11,9 @@
 
     <link rel="stylesheet" href="style.css">
 
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script src="supabase.js"></script>
+
 </head>
 
 
@@ -174,68 +177,150 @@
 
 
 
-    <script>
+   <script>
 
-        // =========================
-        // MENGAMBIL DATA
-        // =========================
-
-        const pengirim =
-            localStorage.getItem("pengirim");
-
-        const penerima =
-            localStorage.getItem("penerima");
-
-        const pesan =
-            localStorage.getItem("pesan");
-        const foto =
-    localStorage.getItem("foto");
-
-const tema =
-    localStorage.getItem("tema");
-    const lagu =
-    localStorage.getItem("lagu");
-
-const namaLagu =
-    localStorage.getItem("namaLagu");
-
-    
- // =========================
-// MENAMPILKAN FOTO
+// =========================
+// MENGAMBIL ID CONFESS DARI URL
 // =========================
 
-if (foto) {
+const urlParams = new URLSearchParams(window.location.search);
+const confessId = urlParams.get("id");
 
-    const fotoElement =
-        document.getElementById("fotoConfess");
 
-    fotoElement.src = foto;
+// =========================
+// MENGAMBIL DATA DARI SUPABASE
+// =========================
 
-    fotoElement.style.display = "block";
+async function ambilConfess() {
 
+    if (!confessId) {
+
+        tampilkanTidakAdaConfess();
+
+        return;
+    }
+
+
+    const { data, error } = await supabaseClient
+        .from("confessions")
+        .select("*")
+        .eq("id", confessId)
+        .single();
+
+
+    if (error) {
+
+        console.error("Error mengambil confess:", error);
+
+        tampilkanTidakAdaConfess();
+
+        return;
+    }
+
+
+    tampilkanConfess(data);
 }
 
+
 // =========================
-// MENAMPILKAN LAGU
+// MENAMPILKAN CONFESS
 // =========================
 
-if (lagu) {
+function tampilkanConfess(data) {
 
-    const audio =
-        document.getElementById("audioLagu");
+    // NAMA PENERIMA
+    document.getElementById("judul").innerText =
+        "Untuk " + data.penerima + " ❤️";
 
-    audio.src = lagu;
+
+    // PESAN
+    document.getElementById("pesan").innerText =
+        data.pesan;
 
 
-    if (namaLagu) {
+    // PENGIRIM
+    document.getElementById("pengirim").innerText =
+        data.pengirim;
 
-        document
-            .getElementById("namaLagu")
-            .innerText = namaLagu;
+
+    // =========================
+    // TEMA
+    // =========================
+
+    if (data.tema) {
+
+        document.body.classList.add(
+            "tema-" + data.tema
+        );
+
+    }
+
+
+    // =========================
+    // FOTO
+    // =========================
+
+    if (data.foto) {
+
+        const fotoElement =
+            document.getElementById("fotoConfess");
+
+
+        fotoElement.src =
+            data.foto;
+
+
+        fotoElement.style.display =
+            "block";
+
+    }
+
+
+    // =========================
+    // LAGU
+    // =========================
+
+    if (data.lagu) {
+
+        const audio =
+            document.getElementById("audioLagu");
+
+
+        audio.src =
+            data.lagu;
+
+
+        if (data.nama_lagu) {
+
+            document.getElementById("namaLagu").innerText =
+                data.nama_lagu;
+
+        }
 
     }
 
 }
+
+
+// =========================
+// CONFESS TIDAK DITEMUKAN
+// =========================
+
+function tampilkanTidakAdaConfess() {
+
+    document.getElementById("judul").innerText =
+        "Confess tidak ditemukan 💌";
+
+
+    document.getElementById("pesan").innerText =
+        "Maaf, confess ini tidak tersedia atau link-nya tidak valid.";
+
+
+    document.getElementById("pengirim").innerText =
+        "-";
+
+}
+
 
 // =========================
 // PLAY / PAUSE LAGU
@@ -246,220 +331,213 @@ function putarMusik() {
     const audio =
         document.getElementById("audioLagu");
 
+
     const tombol =
         document.getElementById("tombolMusik");
+
+
+    if (!audio.src) {
+
+        alert("Belum ada lagu untuk diputar 🎵");
+
+        return;
+    }
 
 
     if (audio.paused) {
 
         audio.play();
 
-        tombol.innerText = "⏸️";
+        tombol.innerText =
+            "⏸️";
 
     } else {
 
         audio.pause();
 
-        tombol.innerText = "▶️";
+        tombol.innerText =
+            "▶️";
 
     }
 
 }
 
+
 // =========================
-// TEMA
+// JAWAB "AKU JUGA"
 // =========================
 
-if (tema) {
+function jawabYa() {
 
-    document.body.classList.add(
-        "tema-" + tema
-    );
+    document.getElementById("hasil").className =
+        "hasil-overlay berhasil";
+
+
+    document.getElementById("hasilIcon").innerText =
+        "💖";
+
+
+    document.getElementById("hasilJudul").innerText =
+        "Yay! ❤️";
+
+
+    document.getElementById("hasilPesan").innerText =
+        "Ternyata perasaan kalian sama!";
+
+
+    buatHati();
 
 }
 
 
-        // =========================
-        // MENAMPILKAN DATA
-        // =========================
+// =========================
+// JAWAB "MAAF"
+// =========================
 
-        if (pengirim && penerima && pesan) {
+function jawabTidak() {
 
-            document.getElementById("judul").innerText =
-                "Untuk " + penerima + " ❤️";
+    document.getElementById("hasil").className =
+        "hasil-overlay lembut";
 
-            document.getElementById("pesan").innerText =
-                pesan;
 
-            document.getElementById("pengirim").innerText =
-                pengirim;
+    document.getElementById("hasilIcon").innerText =
+        "🤍";
 
-        } else {
 
-            document.getElementById("judul").innerText =
-                "Belum ada confess 💌";
+    document.getElementById("hasilJudul").innerText =
+        "Tidak apa-apa 🤍";
 
-            document.getElementById("pesan").innerText =
-                "Silakan buat confess terlebih dahulu.";
 
-            document.getElementById("pengirim").innerText =
-                "-";
+    document.getElementById("hasilPesan").innerText =
+        "Terima kasih sudah membaca dan menghargai perasaanku.";
 
-        }
+}
 
 
+// =========================
+// TUTUP HASIL
+// =========================
 
-        // =========================
-        // JAWABAN "AKU JUGA"
-        // =========================
+function tutupHasil() {
 
-        function jawabYa() {
+    document.getElementById("hasil").className =
+        "hasil-overlay";
 
-            document.getElementById("hasil").className =
-                "hasil-overlay berhasil";
+}
 
 
-            document.getElementById("hasilIcon").innerText =
-                "💖";
+// =========================
+// BUAT CONFESS BARU
+// =========================
 
+function confessBaru() {
 
-            document.getElementById("hasilJudul").innerText =
-                "Yay! ❤️";
+    localStorage.removeItem("pengirim");
 
+    localStorage.removeItem("penerima");
 
-            document.getElementById("hasilPesan").innerText =
-                "Ternyata perasaan kalian sama!";
+    localStorage.removeItem("pesan");
 
+    localStorage.removeItem("foto");
 
-            buatHati();
+    localStorage.removeItem("lagu");
 
-        }
+    localStorage.removeItem("namaLagu");
 
+    localStorage.removeItem("tema");
 
+    localStorage.removeItem("confessId");
 
-        // =========================
-        // JAWABAN "MAAF"
-        // =========================
 
-        function jawabTidak() {
+    window.location.href =
+        "create.html";
 
-            document.getElementById("hasil").className =
-                "hasil-overlay lembut";
+}
 
 
-            document.getElementById("hasilIcon").innerText =
-                "🤍";
+// =========================
+// ANIMASI HATI
+// =========================
 
+function buatHati() {
 
-            document.getElementById("hasilJudul").innerText =
-                "Tidak apa-apa 🤍";
+    for (let i = 0; i < 25; i++) {
 
+        const hati =
+            document.createElement("div");
 
-            document.getElementById("hasilPesan").innerText =
-                "Terima kasih sudah membaca dan menghargai perasaanku.";
 
-        }
+        hati.className =
+            "hati-terbang";
 
 
+        hati.innerText =
+            "❤️";
 
-        // =========================
-        // TUTUP HASIL
-        // =========================
 
-        function tutupHasil() {
+        hati.style.left =
+            Math.random() * 100 + "%";
 
-            document.getElementById("hasil").className =
-                "hasil-overlay";
 
-        }
+        hati.style.animationDelay =
+            Math.random() * 2 + "s";
 
 
+        hati.style.fontSize =
+            (15 + Math.random() * 25) + "px";
 
-        // =========================
-        // BUAT CONFESS BARU
-        // =========================
 
-        function confessBaru() {
+        document.body.appendChild(hati);
 
-            localStorage.removeItem("pengirim");
 
-            localStorage.removeItem("penerima");
+        setTimeout(function () {
 
-            localStorage.removeItem("pesan");
+            hati.remove();
 
+        }, 4000);
 
-            window.location.href =
-                "create.html";
+    }
 
-        }
+}
 
 
-
-        // =========================
-        // ANIMASI HATI
-        // =========================
-
-        function buatHati() {
-
-            for (let i = 0; i < 25; i++) {
-
-                const hati =
-                    document.createElement("div");
-
-
-                hati.className =
-                    "hati-terbang";
-
-
-                hati.innerText =
-                    "❤️";
-
-
-                hati.style.left =
-                    Math.random() * 100 + "%";
-
-
-                hati.style.animationDelay =
-                    Math.random() * 2 + "s";
-
-
-                hati.style.fontSize =
-                    (15 + Math.random() * 25) + "px";
-
-
-                document.body.appendChild(hati);
-
-
-                setTimeout(function () {
-
-                    hati.remove();
-
-                }, 4000);
-
-            }
-
-        }
- // =========================
+// =========================
 // BAGIKAN CONFESS
 // =========================
 
 function bagikanConfess() {
 
-    const link = window.location.href;
+    const link =
+        window.location.href;
 
-    document.getElementById("hasilIcon").innerText = "🔗";
+
+    document.getElementById("hasilIcon").innerText =
+        "🔗";
+
 
     document.getElementById("hasilJudul").innerText =
         "Bagikan Confess 💌";
 
+
     document.getElementById("hasilPesan").innerHTML =
         "Salin link di bawah ini:<br><br>" +
-        "<input id='linkConfess' value='" + link + "' readonly>";
+        "<input id='linkConfess' value='" +
+        link +
+        "' readonly style='width:100%; box-sizing:border-box;'>";
+
 
     document.getElementById("hasil").className =
         "hasil-overlay berhasil";
-}
-</script>
 
+}
+
+
+// =========================
+// JALANKAN SAAT HALAMAN DIBUKA
+// =========================
+
+ambilConfess();
+
+</script>
 </body>
 </html>
