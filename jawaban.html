@@ -1,56 +1,65 @@
 <!DOCTYPE html>
+
 <html lang="id">
 
 <head>
 
-    <meta charset="UTF-8">
+```
+<meta charset="UTF-8">
 
-    <meta
-        name="viewport"
-        content="width=device-width, initial-scale=1.0"
-    >
+<meta
+    name="viewport"
+    content="width=device-width, initial-scale=1.0"
+>
 
-    <title>Jawaban Confess 🔐</title>
+<title>Jawaban Confess 🔐</title>
 
-    <link
-        rel="stylesheet"
-        href="style.css"
-    >
+<link
+    rel="stylesheet"
+    href="style.css"
+>
 
-    <script
-        src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2">
-    </script>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 
-    <script src="supabase.js"></script>
+<script src="supabase.js"></script>
+```
 
 </head>
-
 
 <body>
 
 <div class="background">
 
-    <div class="card" id="jawabanCard">
+```
+<div
+    class="card"
+    id="jawabanCard"
+>
 
-        <div class="heart">
-            🔐
-        </div>
-
-        <h1>
-            Mengecek Jawaban...
-        </h1>
-
-        <p>
-            Tunggu sebentar 💕
-        </p>
-
+    <div class="heart">
+        🔐
     </div>
+
+    <h1>
+        Mengecek Jawaban...
+    </h1>
+
+    <p>
+        Tunggu sebentar 💕
+    </p>
+
+</div>
+```
 
 </div>
 
-
-
 <script>
+
+// =====================================
+// DATABASE
+// =====================================
+
+const db = window.supabaseClient;
 
 
 // =====================================
@@ -71,7 +80,6 @@ const token =
     params.get("token");
 
 
-
 // =====================================
 // CEK JAWABAN
 // =====================================
@@ -83,6 +91,33 @@ async function cekJawaban() {
             "jawabanCard"
         );
 
+
+    // =================================
+    // CEK SUPABASE
+    // =================================
+
+    if (!db) {
+
+        card.innerHTML = `
+
+            <div class="heart">
+                💔
+            </div>
+
+            <h1>
+                Koneksi bermasalah
+            </h1>
+
+            <p>
+                Supabase belum berhasil dimuat.
+                Silakan refresh halaman.
+            </p>
+
+        `;
+
+        return;
+
+    }
 
 
     // =================================
@@ -113,62 +148,46 @@ async function cekJawaban() {
     }
 
 
+    try {
 
-    // =================================
-    // AMBIL DATA CONFESS
-    // =================================
+        // =================================
+        // AMBIL DATA CONFESS
+        // =================================
 
-    const {
-        data: confess,
-        error: confessError
-    } =
-        await supabaseClient
-            .from("confessions")
-            .select(
-                "pengirim,penerima"
-            )
-            .eq(
-                "id",
-                confessId
-            )
-            .single();
-
-
-
-    if (confessError || !confess) {
-
-        card.innerHTML = `
-
-            <div class="heart">
-                💔
-            </div>
-
-            <h1>
-                Confess tidak ditemukan
-            </h1>
-
-            <p>
-                Link mungkin sudah tidak valid.
-            </p>
-
-        `;
-
-        return;
-
-    }
+        const {
+            data: confess,
+            error: confessError
+        } =
+            await db
+                .from("confessions")
+                .select(
+                    "pengirim,penerima"
+                )
+                .eq(
+                    "id",
+                    confessId
+                )
+                .single();
 
 
+        if (confessError || !confess) {
 
-    // =================================
-    // CEK RESPONSE
-    // =================================
+            throw new Error(
+                "Confess tidak ditemukan."
+            );
 
-    const {
-        data,
-        error
-    } =
-        await supabaseClient
-            .rpc(
+        }
+
+
+        // =================================
+        // CEK RESPONSE
+        // =================================
+
+        const {
+            data,
+            error
+        } =
+            await db.rpc(
                 "get_confession_response",
                 {
                     p_confess_id:
@@ -180,10 +199,160 @@ async function cekJawaban() {
             );
 
 
+        if (error) {
 
-    if (error) {
+            throw error;
 
-        console.error(error);
+        }
+
+
+        // =================================
+        // BELUM ADA JAWABAN
+        // =================================
+
+        if (
+            !data ||
+            data.length === 0
+        ) {
+
+            card.innerHTML = `
+
+                <div class="heart">
+                    💌
+                </div>
+
+                <h1>
+                    Belum ada jawaban
+                </h1>
+
+                <p>
+                    <strong>
+                        ${escapeHTML(confess.penerima)}
+                    </strong>
+                    belum memberikan jawaban
+                    untuk confess kamu.
+                </p>
+
+                <div style="font-size:40px;">
+                    💭💕
+                </div>
+
+            `;
+
+            return;
+
+        }
+
+
+        // =================================
+        // ADA JAWABAN
+        // =================================
+
+        const jawaban =
+            data[0].jawaban;
+
+
+        const tanggal =
+            new Date(
+                data[0].dijawab_pada
+            ).toLocaleString(
+                "id-ID"
+            );
+
+
+        // =================================
+        // JAWABAN IYA
+        // =================================
+
+        if (jawaban === "ya") {
+
+            card.innerHTML = `
+
+                <div class="heart">
+                    💖
+                </div>
+
+                <h1>
+                    Dia menerima! 💕
+                </h1>
+
+                <p>
+                    <strong>
+                        ${escapeHTML(
+                            confess.penerima
+                        )}
+                    </strong>
+                    menjawab:
+                </p>
+
+                <h2>
+                    "IYA ❤️"
+                </h2>
+
+                <div style="font-size:45px;">
+                    💕💖💗💞
+                </div>
+
+                <p style="font-size:13px;">
+                    Dijawab pada:<br>
+                    ${tanggal}
+                </p>
+
+            `;
+
+        }
+
+        // =================================
+        // JAWABAN TIDAK
+        // =================================
+
+        else {
+
+            card.innerHTML = `
+
+                <div class="heart">
+                    💔
+                </div>
+
+                <h1>
+                    Jawaban sudah diterima
+                </h1>
+
+                <p>
+                    <strong>
+                        ${escapeHTML(
+                            confess.penerima
+                        )}
+                    </strong>
+                    menjawab:
+                </p>
+
+                <h2>
+                    "TIDAK 💔"
+                </h2>
+
+                <div style="font-size:45px;">
+                    🌸💌
+                </div>
+
+                <p style="font-size:13px;">
+                    Dijawab pada:<br>
+                    ${tanggal}
+                </p>
+
+            `;
+
+        }
+
+    }
+
+    catch (error) {
+
+        console.error(
+            "CEK JAWABAN ERROR:",
+            error
+        );
+
 
         card.innerHTML = `
 
@@ -196,132 +365,9 @@ async function cekJawaban() {
             </h1>
 
             <p>
-                ${error.message}
-            </p>
-
-        `;
-
-        return;
-
-    }
-
-
-
-    // =================================
-    // BELUM ADA JAWABAN
-    // =================================
-
-    if (!data || data.length === 0) {
-
-        card.innerHTML = `
-
-            <div class="heart">
-                💌
-            </div>
-
-            <h1>
-                Belum ada jawaban
-            </h1>
-
-            <p>
-                ${escapeHTML(confess.penerima)}
-                belum memberikan jawaban
-                untuk confess kamu.
-            </p>
-
-            <div style="font-size:40px;">
-                💭💕
-            </div>
-
-        `;
-
-        return;
-
-    }
-
-
-
-    // =================================
-    // ADA JAWABAN
-    // =================================
-
-    const jawaban =
-        data[0].jawaban;
-
-
-    const tanggal =
-        new Date(
-            data[0].dijawab_pada
-        ).toLocaleString(
-            "id-ID"
-        );
-
-
-
-    if (jawaban === "ya") {
-
-        card.innerHTML = `
-
-            <div class="heart">
-                💖
-            </div>
-
-            <h1>
-                Dia menerima! 💕
-            </h1>
-
-            <p>
-                <strong>
-                    ${escapeHTML(confess.penerima)}
-                </strong>
-                menjawab:
-            </p>
-
-            <h2>
-                "IYA ❤️"
-            </h2>
-
-            <div style="font-size:45px;">
-                💕💖💗💞
-            </div>
-
-            <p style="font-size:13px;">
-                Dijawab pada:<br>
-                ${tanggal}
-            </p>
-
-        `;
-
-    } else {
-
-        card.innerHTML = `
-
-            <div class="heart">
-                💔
-            </div>
-
-            <h1>
-                Jawaban sudah diterima
-            </h1>
-
-            <p>
-                <strong>
-                    ${escapeHTML(confess.penerima)}
-                </strong>
-                menjawab:
-            </p>
-
-            <h2>
-                "TIDAK 💔"
-            </h2>
-
-            <div style="font-size:45px;">
-                🌸💌
-            </div>
-
-            <p style="font-size:13px;">
-                Dijawab pada:<br>
-                ${tanggal}
+                ${escapeHTML(
+                    error.message
+                )}
             </p>
 
         `;
@@ -331,9 +377,8 @@ async function cekJawaban() {
 }
 
 
-
 // =====================================
-// AMANKAN TEKS
+// AMANKAN HTML
 // =====================================
 
 function escapeHTML(text) {
@@ -349,7 +394,6 @@ function escapeHTML(text) {
 }
 
 
-
 // =====================================
 // JALANKAN
 // =====================================
@@ -359,5 +403,4 @@ cekJawaban();
 </script>
 
 </body>
-
 </html>
