@@ -12,6 +12,9 @@
 
     <link rel="stylesheet" href="style.css">
 
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="supabase.js"></script>
+
 </head>
 
 
@@ -229,88 +232,218 @@ document
         // LIHAT CONFESS
         // =========================
 
-        function lihatConfess() {
+        async function lihatConfess() {
 
-            const pengirim =
-                document
-                    .getElementById("pengirim")
-                    .value
-                    .trim();
+    const pengirim =
+        document.getElementById("pengirim").value.trim();
 
+    const penerima =
+        document.getElementById("penerima").value.trim();
 
-            const penerima =
-                document
-                    .getElementById("penerima")
-                    .value
-                    .trim();
+    const pesan =
+        document.getElementById("pesan").value.trim();
 
+    const tema =
+        document.getElementById("tema").value;
 
-            const pesan =
-                document
-                    .getElementById("pesan")
-                    .value
-                    .trim();
+    const fotoFile =
+        document.getElementById("foto").files[0];
+
+    const laguFile =
+        document.getElementById("lagu").files[0];
 
 
-            const tema =
-                document
-                    .getElementById("tema")
-                    .value;
+    // =========================
+    // CEK DATA
+    // =========================
+
+    if (
+        pengirim === "" ||
+        penerima === "" ||
+        pesan === ""
+    ) {
+
+        alert(
+            "Silakan isi semua data terlebih dahulu ❤️"
+        );
+
+        return;
+    }
 
 
-            // Validasi
+    // =========================
+    // TAMPILKAN PROSES
+    // =========================
 
-            if (
-                pengirim === "" ||
-                penerima === "" ||
-                pesan === ""
-            ) {
+    const tombol =
+        document.querySelector("button");
 
-                alert(
-                    "Silakan isi semua data terlebih dahulu ❤️"
-                );
+    tombol.disabled = true;
 
-                return;
+    tombol.innerText =
+        "Menyimpan Confess... 💌";
 
+
+    try {
+
+        let fotoURL = null;
+        let laguURL = null;
+        let namaLagu = null;
+
+
+        // =========================
+        // UPLOAD FOTO
+        // =========================
+
+        if (fotoFile) {
+
+            const namaFoto =
+                "foto-" +
+                crypto.randomUUID() +
+                "-" +
+                fotoFile.name;
+
+            const { error: fotoError } =
+                await supabaseClient
+                    .storage
+                    .from("confess-media")
+                    .upload(
+                        namaFoto,
+                        fotoFile,
+                        {
+                            cacheControl: "3600",
+                            upsert: false
+                        }
+                    );
+
+            if (fotoError) {
+                throw fotoError;
             }
 
 
-            // Simpan data
+            const fotoResult =
+                supabaseClient
+                    .storage
+                    .from("confess-media")
+                    .getPublicUrl(namaFoto);
 
-            localStorage.setItem(
-                "pengirim",
-                pengirim
-            );
-
-
-            localStorage.setItem(
-                "penerima",
-                penerima
-            );
-
-
-            localStorage.setItem(
-                "pesan",
-                pesan
-            );
-
-
-            localStorage.setItem(
-                "tema",
-                tema
-            );
-
-
-            // Pindah ke halaman confess
-
-            window.location.href =
-                "confess.html";
-
+            fotoURL =
+                fotoResult.data.publicUrl;
         }
 
-    </script>
 
+        // =========================
+        // UPLOAD LAGU
+        // =========================
+
+        if (laguFile) {
+
+            namaLagu =
+                laguFile.name;
+
+            const namaFile =
+                "lagu-" +
+                crypto.randomUUID() +
+                "-" +
+                laguFile.name;
+
+            const { error: laguError } =
+                await supabaseClient
+                    .storage
+                    .from("confess-media")
+                    .upload(
+                        namaFile,
+                        laguFile,
+                        {
+                            cacheControl: "3600",
+                            upsert: false
+                        }
+                    );
+
+            if (laguError) {
+                throw laguError;
+            }
+
+
+            const laguResult =
+                supabaseClient
+                    .storage
+                    .from("confess-media")
+                    .getPublicUrl(namaFile);
+
+            laguURL =
+                laguResult.data.publicUrl;
+        }
+
+
+        // =========================
+        // SIMPAN CONFESS
+        // =========================
+
+        const { data, error } =
+            await supabaseClient
+                .from("confessions")
+                .insert({
+
+                    pengirim: pengirim,
+
+                    penerima: penerima,
+
+                    pesan: pesan,
+
+                    tema: tema,
+
+                    foto: fotoURL,
+
+                    lagu: laguURL,
+
+                    nama_lagu: namaLagu
+
+                })
+                .select()
+                .single();
+
+
+        if (error) {
+            throw error;
+        }
+
+
+        // =========================
+        // SIMPAN ID
+        // =========================
+
+        localStorage.setItem(
+            "confessId",
+            data.id
+        );
+
+
+        // =========================
+        // PINDAH KE CONFESS
+        // =========================
+
+        window.location.href =
+            "confess.html?id=" +
+            data.id;
+
+
+    } catch (error) {
+
+        console.error(error);
+
+        alert(
+            "Gagal menyimpan confess.\n\n" +
+            error.message
+        );
+
+        tombol.disabled = false;
+
+        tombol.innerText =
+            "Lihat Confess 💕";
+    }
+}
+</script>
 
 </body>
-
 </html>
