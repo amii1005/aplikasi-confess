@@ -1,0 +1,363 @@
+<!DOCTYPE html>
+<html lang="id">
+
+<head>
+
+    <meta charset="UTF-8">
+
+    <meta
+        name="viewport"
+        content="width=device-width, initial-scale=1.0"
+    >
+
+    <title>Jawaban Confess 🔐</title>
+
+    <link
+        rel="stylesheet"
+        href="style.css"
+    >
+
+    <script
+        src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2">
+    </script>
+
+    <script src="supabase.js"></script>
+
+</head>
+
+
+<body>
+
+<div class="background">
+
+    <div class="card" id="jawabanCard">
+
+        <div class="heart">
+            🔐
+        </div>
+
+        <h1>
+            Mengecek Jawaban...
+        </h1>
+
+        <p>
+            Tunggu sebentar 💕
+        </p>
+
+    </div>
+
+</div>
+
+
+
+<script>
+
+
+// =====================================
+// AMBIL PARAMETER
+// =====================================
+
+const params =
+    new URLSearchParams(
+        window.location.search
+    );
+
+
+const confessId =
+    params.get("id");
+
+
+const token =
+    params.get("token");
+
+
+
+// =====================================
+// CEK JAWABAN
+// =====================================
+
+async function cekJawaban() {
+
+    const card =
+        document.getElementById(
+            "jawabanCard"
+        );
+
+
+
+    // =================================
+    // CEK LINK
+    // =================================
+
+    if (!confessId || !token) {
+
+        card.innerHTML = `
+
+            <div class="heart">
+                🔒
+            </div>
+
+            <h1>
+                Link tidak valid
+            </h1>
+
+            <p>
+                Link khusus pengirim
+                tidak lengkap.
+            </p>
+
+        `;
+
+        return;
+
+    }
+
+
+
+    // =================================
+    // AMBIL DATA CONFESS
+    // =================================
+
+    const {
+        data: confess,
+        error: confessError
+    } =
+        await supabaseClient
+            .from("confessions")
+            .select(
+                "pengirim,penerima"
+            )
+            .eq(
+                "id",
+                confessId
+            )
+            .single();
+
+
+
+    if (confessError || !confess) {
+
+        card.innerHTML = `
+
+            <div class="heart">
+                💔
+            </div>
+
+            <h1>
+                Confess tidak ditemukan
+            </h1>
+
+            <p>
+                Link mungkin sudah tidak valid.
+            </p>
+
+        `;
+
+        return;
+
+    }
+
+
+
+    // =================================
+    // CEK RESPONSE
+    // =================================
+
+    const {
+        data,
+        error
+    } =
+        await supabaseClient
+            .rpc(
+                "get_confession_response",
+                {
+                    p_confess_id:
+                        confessId,
+
+                    p_token:
+                        token
+                }
+            );
+
+
+
+    if (error) {
+
+        console.error(error);
+
+        card.innerHTML = `
+
+            <div class="heart">
+                💔
+            </div>
+
+            <h1>
+                Terjadi kesalahan
+            </h1>
+
+            <p>
+                ${error.message}
+            </p>
+
+        `;
+
+        return;
+
+    }
+
+
+
+    // =================================
+    // BELUM ADA JAWABAN
+    // =================================
+
+    if (!data || data.length === 0) {
+
+        card.innerHTML = `
+
+            <div class="heart">
+                💌
+            </div>
+
+            <h1>
+                Belum ada jawaban
+            </h1>
+
+            <p>
+                ${escapeHTML(confess.penerima)}
+                belum memberikan jawaban
+                untuk confess kamu.
+            </p>
+
+            <div style="font-size:40px;">
+                💭💕
+            </div>
+
+        `;
+
+        return;
+
+    }
+
+
+
+    // =================================
+    // ADA JAWABAN
+    // =================================
+
+    const jawaban =
+        data[0].jawaban;
+
+
+    const tanggal =
+        new Date(
+            data[0].dijawab_pada
+        ).toLocaleString(
+            "id-ID"
+        );
+
+
+
+    if (jawaban === "ya") {
+
+        card.innerHTML = `
+
+            <div class="heart">
+                💖
+            </div>
+
+            <h1>
+                Dia menerima! 💕
+            </h1>
+
+            <p>
+                <strong>
+                    ${escapeHTML(confess.penerima)}
+                </strong>
+                menjawab:
+            </p>
+
+            <h2>
+                "IYA ❤️"
+            </h2>
+
+            <div style="font-size:45px;">
+                💕💖💗💞
+            </div>
+
+            <p style="font-size:13px;">
+                Dijawab pada:<br>
+                ${tanggal}
+            </p>
+
+        `;
+
+    } else {
+
+        card.innerHTML = `
+
+            <div class="heart">
+                💔
+            </div>
+
+            <h1>
+                Jawaban sudah diterima
+            </h1>
+
+            <p>
+                <strong>
+                    ${escapeHTML(confess.penerima)}
+                </strong>
+                menjawab:
+            </p>
+
+            <h2>
+                "TIDAK 💔"
+            </h2>
+
+            <div style="font-size:45px;">
+                🌸💌
+            </div>
+
+            <p style="font-size:13px;">
+                Dijawab pada:<br>
+                ${tanggal}
+            </p>
+
+        `;
+
+    }
+
+}
+
+
+
+// =====================================
+// AMANKAN TEKS
+// =====================================
+
+function escapeHTML(text) {
+
+    const div =
+        document.createElement("div");
+
+    div.textContent =
+        text || "";
+
+    return div.innerHTML;
+
+}
+
+
+
+// =====================================
+// JALANKAN
+// =====================================
+
+cekJawaban();
+
+</script>
+
+</body>
+
+</html>
