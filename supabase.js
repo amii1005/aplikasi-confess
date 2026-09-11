@@ -10,5 +10,5 @@ const supabaseClient =
         SUPABASE_KEY
     );
 
-// Dipakai oleh confess.html
+// Supaya confess.html juga bisa memakai nama "supabase"
 const supabase = supabaseClient;
