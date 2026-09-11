@@ -295,40 +295,58 @@ function siapMembaca() {
 
 async function kirimJawaban(jawaban) {
 
-    if (!confessData) return;
+    console.log("Tombol ditekan:", jawaban);
 
+    const hasil = document.getElementById("hasilJawaban");
 
-    const { data, error } = await supabase.rpc(
-        "submit_confession_response",
-        {
-            p_confess_id: confessData.id,
-            p_jawaban: jawaban
-        }
-    );
-
-
-    if (error) {
-
-        console.error(error);
-
-        document.getElementById("hasilJawaban").innerText =
-            "Terjadi kesalahan. Silakan coba lagi.";
-
+    if (!confessData) {
+        hasil.innerText =
+            "⏳ Data confess belum selesai dimuat. Coba tunggu sebentar.";
         return;
     }
 
+    hasil.innerText = "⏳ Mengirim jawaban...";
 
-    document.getElementById("hasilJawaban").innerText =
-        jawaban === "ya"
-            ? "💗 Terima kasih sudah menjawab..."
-            : "💌 Terima kasih sudah memberikan jawaban...";
+    try {
 
+        const { data, error } = await supabase.rpc(
+            "submit_confession_response",
+            {
+                p_confess_id: confessData.id,
+                p_jawaban: jawaban
+            }
+        );
 
-    document.querySelectorAll(".jawaban button")
-        .forEach(button => {
+        console.log("Response:", data);
+        console.log("Error:", error);
+
+        if (error) {
+            throw error;
+        }
+
+        if (jawaban === "ya") {
+
+            hasil.innerText =
+                "💗 Jawabanmu sudah terkirim. Terima kasih sudah menjawab ❤️";
+
+        } else {
+
+            hasil.innerText =
+                "💌 Jawabanmu sudah terkirim. Terima kasih sudah memberikan jawaban.";
+
+        }
+
+        document.querySelectorAll(".jawaban button").forEach(button => {
             button.disabled = true;
         });
 
+    } catch (error) {
+
+        console.error("Gagal mengirim jawaban:", error);
+
+        hasil.innerText =
+            "❌ Jawaban gagal dikirim: " + error.message;
+    }
 }
 
 
