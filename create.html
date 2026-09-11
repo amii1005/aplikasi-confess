@@ -2,7 +2,670 @@
 <html lang="id">
 
 <head>
+<!DOCTYPE html>
+<html lang="id">
 
+<head>
+
+    <meta charset="UTF-8">
+
+    <meta
+        name="viewport"
+        content="width=device-width, initial-scale=1.0"
+    >
+
+    <title>Buat Confess 💌</title>
+
+    <link
+        rel="stylesheet"
+        href="style.css"
+    >
+
+   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
+<script>
+    const SUPABASE_URL =
+        "https://sycuueukzazluxoyhozn.supabase.co";
+
+    const SUPABASE_KEY =
+        "sb_publishable_kLdCZ4D1xPR5jpTpENFxSA_Y9iuGtjz";
+
+    const supabaseClient =
+        window.supabase.createClient(
+            SUPABASE_URL,
+            SUPABASE_KEY
+        );
+</script>
+
+</head>
+
+
+<body>
+
+<div class="background">
+
+    <div class="card" id="card">
+
+        <div class="heart">
+            💖
+        </div>
+
+        <h1>
+            Buat Confess
+        </h1>
+
+        <p>
+            Isi pesan yang ingin kamu sampaikan
+            kepada seseorang yang spesial.
+        </p>
+
+
+        <input
+            type="text"
+            id="pengirim"
+            placeholder="Nama kamu"
+        >
+
+
+        <input
+            type="text"
+            id="penerima"
+            placeholder="Nama orang yang dituju"
+        >
+
+
+        <textarea
+            id="pesan"
+            placeholder="Tulis pesan confess kamu..."
+        ></textarea>
+
+
+        <!-- FOTO -->
+
+        <div class="pilihan">
+
+            <label>
+                🖼️ Tambahkan Foto
+            </label>
+
+            <input
+                type="file"
+                id="foto"
+                accept="image/*"
+            >
+
+        </div>
+
+
+        <!-- LAGU -->
+
+        <div class="pilihan">
+
+            <label>
+                🎵 Tambahkan Lagu
+            </label>
+
+            <input
+                type="file"
+                id="lagu"
+                accept="audio/*"
+            >
+
+        </div>
+
+
+        <!-- PREVIEW FOTO -->
+
+        <img
+            id="previewFoto"
+            class="preview-foto"
+            alt="Preview foto"
+        >
+
+
+        <!-- TEMA -->
+
+        <div class="pilihan">
+
+            <label>
+                🎨 Pilih Tema
+            </label>
+
+            <select id="tema">
+
+                <option value="pink">
+                    🌸 Sweet Pink
+                </option>
+
+                <option value="red">
+                    🌹 Romantic Red
+                </option>
+
+                <option value="purple">
+                    💜 Purple Dream
+                </option>
+
+                <option value="dark">
+                    🌙 Midnight Love
+                </option>
+
+            </select>
+
+        </div>
+
+
+        <button onclick="lihatConfess()">
+            Lihat Confess 💕
+        </button>
+
+    </div>
+
+</div>
+
+
+<script>
+
+
+// =====================================
+// PREVIEW FOTO
+// =====================================
+
+document
+    .getElementById("foto")
+    .addEventListener("change", function () {
+
+        const file = this.files[0];
+
+        if (!file) {
+            return;
+        }
+
+        const reader =
+            new FileReader();
+
+        reader.onload =
+            function (event) {
+
+                const preview =
+                    document.getElementById(
+                        "previewFoto"
+                    );
+
+                preview.src =
+                    event.target.result;
+
+                preview.style.display =
+                    "block";
+            };
+
+        reader.readAsDataURL(file);
+
+    });
+
+
+
+// =====================================
+// COPY LINK
+// =====================================
+
+async function copyLink(id) {
+
+    const input =
+        document.getElementById(id);
+
+    try {
+
+        await navigator.clipboard.writeText(
+            input.value
+        );
+
+        alert(
+            "Link berhasil disalin 💕"
+        );
+
+    } catch (error) {
+
+        input.select();
+
+        document.execCommand("copy");
+
+        alert(
+            "Link berhasil disalin 💕"
+        );
+    }
+
+}
+
+
+
+// =====================================
+// BUAT CONFESS
+// =====================================
+
+async function lihatConfess() {
+
+    const pengirim =
+        document
+            .getElementById("pengirim")
+            .value
+            .trim();
+
+
+    const penerima =
+        document
+            .getElementById("penerima")
+            .value
+            .trim();
+
+
+    const pesan =
+        document
+            .getElementById("pesan")
+            .value
+            .trim();
+
+
+    const tema =
+        document
+            .getElementById("tema")
+            .value;
+
+
+    const fotoFile =
+        document
+            .getElementById("foto")
+            .files[0];
+
+
+    const laguFile =
+        document
+            .getElementById("lagu")
+            .files[0];
+
+
+
+    // =================================
+    // CEK DATA
+    // =================================
+
+    if (
+        pengirim === "" ||
+        penerima === "" ||
+        pesan === ""
+    ) {
+
+        alert(
+            "Silakan isi semua data terlebih dahulu ❤️"
+        );
+
+        return;
+    }
+
+
+
+    // =================================
+    // TOMBOL
+    // =================================
+
+    const tombol =
+        document.querySelector("button");
+
+
+    tombol.disabled =
+        true;
+
+
+    tombol.innerText =
+        "Menyimpan Confess... 💌";
+
+
+
+    try {
+
+        let fotoURL =
+            null;
+
+        let laguURL =
+            null;
+
+        let namaLagu =
+            null;
+
+
+
+        // =================================
+        // UPLOAD FOTO
+        // =================================
+
+        if (fotoFile) {
+
+            const namaFoto =
+                "foto-" +
+                crypto.randomUUID() +
+                "-" +
+                fotoFile.name;
+
+
+            const {
+                error: fotoError
+            } =
+                await supabaseClient
+                    .storage
+                    .from("confess-media")
+                    .upload(
+                        namaFoto,
+                        fotoFile,
+                        {
+                            cacheControl: "3600",
+                            upsert: false
+                        }
+                    );
+
+
+            if (fotoError) {
+
+                throw fotoError;
+
+            }
+
+
+            const fotoResult =
+                supabaseClient
+                    .storage
+                    .from("confess-media")
+                    .getPublicUrl(
+                        namaFoto
+                    );
+
+
+            fotoURL =
+                fotoResult
+                    .data
+                    .publicUrl;
+
+        }
+
+
+
+        // =================================
+        // UPLOAD LAGU
+        // =================================
+
+        if (laguFile) {
+
+            namaLagu =
+                laguFile.name;
+
+
+            const namaFile =
+                "lagu-" +
+                crypto.randomUUID() +
+                "-" +
+                laguFile.name;
+
+
+            const {
+                error: laguError
+            } =
+                await supabaseClient
+                    .storage
+                    .from("confess-media")
+                    .upload(
+                        namaFile,
+                        laguFile,
+                        {
+                            cacheControl: "3600",
+                            upsert: false
+                        }
+                    );
+
+
+            if (laguError) {
+
+                throw laguError;
+
+            }
+
+
+            const laguResult =
+                supabaseClient
+                    .storage
+                    .from("confess-media")
+                    .getPublicUrl(
+                        namaFile
+                    );
+
+
+            laguURL =
+                laguResult
+                    .data
+                    .publicUrl;
+
+        }
+
+
+
+        // =================================
+        // BUAT CONFESS VIA RPC
+        // =================================
+
+        const {
+            data,
+            error
+        } =
+            await supabaseClient
+                .rpc(
+                    "create_confession",
+                    {
+                        p_pengirim:
+                            pengirim,
+
+                        p_penerima:
+                            penerima,
+
+                        p_pesan:
+                            pesan,
+
+                        p_tema:
+                            tema,
+
+                        p_foto:
+                            fotoURL,
+
+                        p_lagu:
+                            laguURL,
+
+                        p_nama_lagu:
+                            namaLagu
+                    }
+                );
+
+
+        if (error) {
+
+            throw error;
+
+        }
+
+
+
+        // =================================
+        // HASIL
+        // =================================
+
+        const hasil =
+            Array.isArray(data)
+                ? data[0]
+                : data;
+
+
+        const id =
+            hasil.id;
+
+
+        const token =
+            hasil.token;
+
+
+
+        // =================================
+        // LINK PENERIMA
+        // =================================
+
+        const linkPenerima =
+            new URL(
+                "confess.html",
+                window.location.href
+            );
+
+
+        linkPenerima.searchParams.set(
+            "id",
+            id
+        );
+
+
+
+        // =================================
+        // LINK PENGIRIM
+        // =================================
+
+        const linkPengirim =
+            new URL(
+                "jawaban.html",
+                window.location.href
+            );
+
+
+        linkPengirim.searchParams.set(
+            "id",
+            id
+        );
+
+
+        linkPengirim.searchParams.set(
+            "token",
+            token
+        );
+
+
+
+        // =================================
+        // TAMPILKAN HASIL
+        // =================================
+
+        document.getElementById("card")
+            .innerHTML = `
+
+                <div class="heart">
+                    💖
+                </div>
+
+                <h1>
+                    Confess Berhasil Dibuat!
+                </h1>
+
+                <p>
+                    Simpan kedua link ini baik-baik ya 💕
+                </p>
+
+
+                <div style="text-align:left;">
+
+                    <label>
+                        💌 Link untuk penerima
+                    </label>
+
+                    <input
+                        id="linkPenerima"
+                        type="text"
+                        value="${linkPenerima.href}"
+                        readonly
+                    >
+
+                    <button
+                        onclick="copyLink('linkPenerima')"
+                    >
+                        Salin Link Penerima
+                    </button>
+
+
+                    <br><br>
+
+
+                    <label>
+                        🔐 Link khusus kamu
+                    </label>
+
+                    <input
+                        id="linkPengirim"
+                        type="text"
+                        value="${linkPengirim.href}"
+                        readonly
+                    >
+
+                    <button
+                        onclick="copyLink('linkPengirim')"
+                    >
+                        Salin Link Pengirim
+                    </button>
+
+                </div>
+
+
+                <br>
+
+
+                <a
+                    href="${linkPenerima.href}"
+                    style="
+                        display:block;
+                        text-decoration:none;
+                    "
+                >
+
+                    <button>
+                        Lihat Confess 💕
+                    </button>
+
+                </a>
+
+
+                <p style="font-size:13px;">
+                    ⚠️ Jangan berikan link khusus
+                    pengirim kepada penerima.
+                </p>
+
+            `;
+
+
+    } catch (error) {
+
+        console.error(error);
+
+
+        alert(
+            "Gagal membuat confess.\n\n" +
+            error.message
+        );
+
+
+        tombol.disabled =
+            false;
+
+
+        tombol.innerText =
+            "Lihat Confess 💕";
+
+    }
+
+}
+
+</script>
+
+</body>
+
+</html>
     <meta charset="UTF-8">
 
     <meta
